@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BulletBossController : MonoBehaviour
 {
-    public float xBoundary = 150f; // X-axis boundary
+    public float xBoundary = 170f; // X-axis boundary
     public float zBoundary = 60f; // Z-axis boundary
 
     void Start()
@@ -42,11 +42,14 @@ public class BulletBossController : MonoBehaviour
 
             BossController boss = GameObject.Find("Boss").GetComponent<BossController>();
             boss.bulletCounter--;
+            
             Destroy(gameObject);
         }
         else if (!(other.gameObject.CompareTag("Boss")) && !(other.gameObject.CompareTag("BulletBoss")))
         {
+            Destroy(other.gameObject);
             Destroy(gameObject); // Destroy the bullet if it collides with anything else
         }
     }
+
 }

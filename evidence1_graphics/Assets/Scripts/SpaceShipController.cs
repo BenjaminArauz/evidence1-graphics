@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpaceShipController : MonoBehaviour
 {
+    // Ship properties
     public float speed = 40.0f;
     public float turnSpeed = 50.0f;
     public float horizontalInput;
@@ -13,7 +15,8 @@ public class SpaceShipController : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
 
-    public GameObject bulletPrefab; // Assign the bullet prefab in the Inspector
+    // Bullet properties
+    public GameObject bulletPrefab;
     public float bulletSpeed = 20f;
 
     // Start is called before the first frame update
@@ -40,19 +43,16 @@ public class SpaceShipController : MonoBehaviour
     public void takeDamage(int damage)
     {
         currentHealth -= damage;
-        Debug.Log("Ship health: " + currentHealth);
         if (currentHealth <= 0)
         {
             Destroy(gameObject);
+            SceneManager.LoadScene(1);
         }
     }
 
     public void shoot()
     {
-        Debug.Log("Shoot function called");
-        Vector3 spawnPosition = transform.position + transform.forward * 2f; // Bullet spawns slightly ahead of the ship
-        GameObject bullet = Instantiate(bulletPrefab, spawnPosition, transform.rotation);
-        
+        GameObject bullet = Instantiate(bulletPrefab, transform.position + transform.forward * 10f, transform.rotation);
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         rb.velocity = transform.forward * bulletSpeed;
     }

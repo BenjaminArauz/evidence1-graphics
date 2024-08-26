@@ -212,5 +212,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03864479f30709e46ac4b8fdff9f4342, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xBoundary: 150
+  xBoundary: 170
   zBoundary: 60

@@ -1,20 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class BossController : MonoBehaviour
 {
-    public GameObject bulletPrefab;       
-    public TextMeshProUGUI bulletCountTextMesh;
+    // Bullet properties
+    public GameObject bulletPrefab;
     public float bulletSpeed = 20f;       
-    public float shootInterval = 10f;    
-    public int numberBullets = 10;        
-    public float spiralRadius = 2f;
-    public int numberSpirals = 5;
-    public int index = 0;
+
+    // UI properties       
+    public TextMeshProUGUI bulletCountTextMesh;
     public int bulletCounter = 0;
 
+    // Shoot in circle properties
+    public float shootInterval = 10f;    
+    public int numberBullets = 10;
+
+    // Shoot in spiral properties     
+    public float spiralRadius = 2f;
+    public int numberSpirals = 10;
+    
+    // Boss properties
+    public int index = 1;
     public int maxHealth = 200;
     public int currentHealth;
 
@@ -25,7 +34,6 @@ public class BossController : MonoBehaviour
         currentHealth = maxHealth;
         
         angles = new float[numberSpirals];
-        // Set different starting angles for each shot
         for (int i = 0; i < numberSpirals; i++)
         {
             angles[i] = i * (360f / numberSpirals);
@@ -33,6 +41,7 @@ public class BossController : MonoBehaviour
 
         // Start the main coroutine that handles shooting patterns
         StartCoroutine(HandleShootingPatterns());
+        //handle();
     }
 
     void Update()
@@ -97,24 +106,25 @@ public class BossController : MonoBehaviour
     
     void shootSpiral()
     {
+        float [] anglesCopy = angles;
+
         for (int i = 0; i < numberSpirals; i++)
         {
-            float bulletDirX = transform.position.x + Mathf.Sin(angles[i] * Mathf.Deg2Rad) * spiralRadius;
-            float bulletDirZ = transform.position.z + Mathf.Cos(angles[i] * Mathf.Deg2Rad) * spiralRadius;
+            float bulletDirX = Mathf.Sin(anglesCopy[i] * Mathf.Deg2Rad);
+            float bulletDirZ = Mathf.Cos(anglesCopy[i] * Mathf.Deg2Rad);
 
-            Vector3 bulletPosition = new Vector3(bulletDirX, transform.position.y, bulletDirZ);
-            Vector3 bulletDir = (bulletPosition - transform.position).normalized;
-            
+            Vector3 bulletDirection = new Vector3(bulletDirX, 0, bulletDirZ).normalized;
+            Vector3 bulletPosition = transform.position + new Vector3(0f, 1f, 0f);
             GameObject bullet = Instantiate(bulletPrefab, bulletPosition, Quaternion.identity);
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
-            rb.velocity = bulletDir * bulletSpeed;
-            
-            bulletCounter++;
+            rb.velocity = bulletDirection * bulletSpeed;
 
-            angles[i] += 1f;
-            if (angles[i] >= 360f)
+            bulletCounter++;
+            
+            anglesCopy[i] += 1f;
+            if (anglesCopy[i] >= 360f)
             {
-                angles[i] -= 360f;
+                anglesCopy[i] -= 360f;
             }
         }
     }
@@ -122,26 +132,22 @@ public class BossController : MonoBehaviour
     
     void shootCircle()
     {
-        float angleStep = 360f / numberBullets;
-        float angle = 0f;
+        float angleStep = 360f / numberBullets; // Divide 360 grados por el número de balas
+        float angle = 0f; // Ángulo inicial
 
         for (int i = 0; i < numberBullets; i++)
         {
-            float bulletDirX = transform.position.x + Mathf.Sin(angle * Mathf.Deg2Rad);
-            float bulletDirZ = transform.position.z + Mathf.Cos(angle * Mathf.Deg2Rad);
+            float bulletDirX = Mathf.Sin(angle * Mathf.Deg2Rad);
+            float bulletDirZ = Mathf.Cos(angle * Mathf.Deg2Rad);
 
-            Vector3 bulletMoveVector = new Vector3(bulletDirX, transform.position.y, bulletDirZ);
-            Vector3 bulletDir = (bulletMoveVector - transform.position).normalized;
-
-            GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            Vector3 bulletDirection = new Vector3(bulletDirX, 0, bulletDirZ).normalized;
+            GameObject bullet = Instantiate(bulletPrefab, transform.position + new Vector3(0f, 1f, 0f), Quaternion.identity);
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
-            rb.velocity = new Vector3(bulletDir.x, 0, bulletDir.z) * bulletSpeed;
+            rb.velocity = bulletDirection * bulletSpeed;
 
-            angle += angleStep;
-            
             bulletCounter++;
+            angle += angleStep;
         }
-        angle = 0f;
     }
 
 
@@ -156,10 +162,10 @@ public class BossController : MonoBehaviour
     public void takeDamage(int damage)
     {
         currentHealth -= damage;
-        Debug.Log("Boss health: " + currentHealth);
         if (currentHealth <= 0)
         {
             Destroy(gameObject);
+            SceneManager.LoadScene(2);
         }
     }
 }
